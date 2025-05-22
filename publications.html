@@ -26,9 +26,9 @@
     <div class="container position-relative d-flex align-items-center justify-content-between">
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="#" id="information-page"></a></li>
+          <li><a href="./index.html" id="information-page"></a></li>
           <li><a href="./project.html" id="project-project"></a></li>
-          <li><a href="./publications.html" id="publications-page"></a></li>
+          <li><a href="#" id="publications-page"></a></li>
           <li><a href="./secondments.html" id="secondments-page"></a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
@@ -53,14 +53,9 @@
         </div>
       </div>
     </section>
-    <section id="about" class="about section">
-      <div class="container section-title" data-aos="fade-up">
-        <h2 id="about-title"></h2>
-      </div>
-
-      <div class="container">
-        <p id="about-description"></p>
-      </div>
+    <section id="publications" class="about section">
+      <div class="container section-title" data-aos="fade-up"></div>
+      <div class="container" id="publications-container"></div>
     </section>
   </main>
 
@@ -88,11 +83,13 @@
     const BASE_URL = "http://localhost:5000/api";
     let currentLang = localStorage.getItem('lang') || 'en';
     let translations = {};
+
     function setLanguage(lang) {
       currentLang = lang;
       localStorage.setItem('lang', lang);
       updateTexts();
       fetchAboutSection();
+      fetchPublications();
     }
 
     function updateTexts() {
@@ -110,7 +107,7 @@
     }
 
     function fetchAboutSection() {
-      fetch(`${BASE_URL}/informations?lang=${currentLang}`)
+      fetch(`${BASE_URL}/publications?lang=${currentLang}`)
         .then(res => res.json())
         .then(response => {
           const data = response.data?.[0];
@@ -127,6 +124,30 @@
         });
     }
 
+    function fetchPublications() {
+      fetch(`${BASE_URL}/publications`)
+        .then(response => response.json())
+        .then(data => {
+          const container = document.getElementById("publications-container");
+          container.innerHTML = "";
+          const langKey = currentLang.charAt(0).toUpperCase() + currentLang.slice(1);
+          data.data.forEach(item => {
+            const title = item[`title${langKey}`] || item.title;
+            const description = item[`description${langKey}`] || item.description;
+            const section = document.createElement("div");
+            section.className = "mb-4";
+            section.innerHTML = `
+            <h4>${title}</h4>
+            <div>${description}</div>
+          `;
+            container.appendChild(section);
+          });
+        })
+        .catch(error => {
+          console.error("Fetch error:", error);
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       fetch('language.json')
         .then(res => res.json())
@@ -134,9 +155,11 @@
           translations = data;
           updateTexts();
           fetchAboutSection();
+          fetchPublications();
         });
     });
   </script>
+
 </body>
 
 </html>

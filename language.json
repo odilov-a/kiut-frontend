@@ -1,0 +1,41 @@
+{
+  "uz": {
+    "main-performers-word": "Asosiy ijrochilar",
+    "project-managers-word": "Loyha rahbarlari",
+    "students-word": "Talabalar",
+    "others-word": "Boshqalar",
+    "information-page": "Loyha haqida ma'lumot",
+    "project-project": "Loyha ishtirokchilari",
+    "publications-page": "Nashrlar",
+    "secondments-page": "Xizmat safarlari",
+    "project_title": "Fundamental tadqiqotlar loyihasi",
+    "project_description": "Past o‘lchamli tarmoqlangan tuzilmalarda kvant transporti va kvazizarralar dinamikasi: shaffof kvant tarmoqlarni modellashtirish va dizaynlashtirish",
+    "project_funding": "O'zbekiston Respublikasi Innovatsion rivojlanish agentligi tomonidan moliyalashtiriladi<br>(01.10.2021-31.09.2026)"
+  },
+  "ru": {
+    "main-performers-word": "Основные исполнители",
+    "project-managers-word": "Руководители проекта",
+    "students-word": "Студенты",
+    "others-word": "Другие",
+    "information-page": "О проекте",
+    "project-project": "Участники проекта",
+    "publications-page": "Публикации",
+    "secondments-page": "Командировки",
+    "project_title": "Проект по фундаментальным исследованиям",
+    "project_description": "Квантовый транспорт и динамика квазичастиц в разветвленных структурах низкой размерности: моделирование и дизайн прозрачных квантовых сетей",
+    "project_funding": "финансируется Агентством инновационного развития при Министерстве высшего образования, науки и инноваций Республики Узбекистан<br>(01.10.2021-31.09.2026)"
+  },
+  "en": {
+    "main-performers-word": "Main performers",
+    "project-managers-word": "Project managers",
+    "students-word": "Students",
+    "others-word": "Others",
+    "information-page": "Information about the project",
+    "project-project": "Project participants",
+    "publications-page": "Publications",
+    "secondments-page": "Secondments",
+    "project_title": "Fundamental research project",
+    "project_description": "Quantum transport and quasi-particle dynamics in low-dimensional branched structures: Modeling and design of transparent quantum networks",
+    "project_funding": "funded by the Innovative Development Agency under the Ministry of Higher Education, Science and Innovation of the Republic of Uzbekistan<br>(01.10.2021-31.09.2026)"
+  }
+}

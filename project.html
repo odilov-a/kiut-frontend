@@ -26,8 +26,8 @@
     <div class="container position-relative d-flex align-items-center justify-content-between">
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="#" id="information-page"></a></li>
-          <li><a href="./project.html" id="project-project"></a></li>
+          <li><a href="./index.html" id="information-page"></a></li>
+          <li><a href="#" id="project-project"></a></li>
           <li><a href="./publications.html" id="publications-page"></a></li>
           <li><a href="./secondments.html" id="secondments-page"></a></li>
         </ul>
@@ -53,13 +53,17 @@
         </div>
       </div>
     </section>
-    <section id="about" class="about section">
-      <div class="container section-title" data-aos="fade-up">
-        <h2 id="about-title"></h2>
-      </div>
 
+    <section id="team" class="team section">
       <div class="container">
-        <p id="about-description"></p>
+        <h3 id="main-performers-word">Main Performers</h3>
+        <div class="row gy-4 mb-3" id="main-performers"></div>
+        <h3 id="project-managers-word">Project Managers</h3>
+        <div class="row gy-4 mb-3" id="project-managers"></div>
+        <h3 id="students-word">Students</h3>
+        <div class="row gy-4 mb-3" id="students"></div>
+        <h3 id="others-word">Others</h3>
+        <div class="row gy-4 mb-3" id="others"></div>
       </div>
     </section>
   </main>
@@ -76,26 +80,34 @@
       class="bi bi-arrow-up-short"></i></a>
 
   <div id="preloader"></div>
-
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>   
   <script src="assets/vendor/aos/aos.js"></script>
   <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
   <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
   <script src="assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
   <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+
   <script src="assets/js/main.js"></script>
   <script>
-    const BASE_URL = "http://localhost:5000/api";
     let currentLang = localStorage.getItem('lang') || 'en';
     let translations = {};
+
     function setLanguage(lang) {
       currentLang = lang;
       localStorage.setItem('lang', lang);
       updateTexts();
-      fetchAboutSection();
+      renderTeam();
+    }
+
+    function getText(key) {
+      return translations[currentLang]?.[key] || `[${key}]`;
     }
 
     function updateTexts() {
+      document.getElementById('main-performers-word').innerHTML = getText('main-performers-word');
+      document.getElementById('project-managers-word').innerHTML = getText('project-managers-word');
+      document.getElementById('students-word').innerHTML = getText('students-word');
+      document.getElementById('others-word').innerHTML = getText('others-word');
       document.getElementById('information-page').innerHTML = getText('information-page');
       document.getElementById('project-project').innerHTML = getText('project-project');
       document.getElementById('publications-page').innerHTML = getText('publications-page');
@@ -105,38 +117,67 @@
       document.getElementById('project-funding').innerHTML = getText('project_funding');
     }
 
-    function getText(key) {
-      return translations[currentLang]?.[key] || `[${key}]`;
+    function createMemberCard(member) {
+      const name = member[`fullName${capitalize(currentLang)}`] || member.fullName;
+      const position = member[`position${capitalize(currentLang)}`] || member.position;
+      const description = member[`description${capitalize(currentLang)}`] || member.description;
+      const photo = member.photoUrl?.[0];
+      return `
+      <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+        <div class="team-member d-flex align-items-start">
+          <div class="pic">
+            <img src="${photo}" class="img-fluid" alt="${name}">
+          </div>
+          <div class="member-info">
+            <h4>${name}</h4>
+            <span>${position}</span>
+            <p>${description}</p>
+          </div>
+        </div>
+      </div>
+    `;
+    }
+    function capitalize(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
     }
 
-    function fetchAboutSection() {
-      fetch(`${BASE_URL}/informations?lang=${currentLang}`)
+    function renderTeam() {
+      fetch('http://localhost:5000/api/participants')
         .then(res => res.json())
-        .then(response => {
-          const data = response.data?.[0];
-          if (data) {
-            const langSuffix = currentLang.charAt(0).toUpperCase() + currentLang.slice(1);
-            const titleKey = `title${langSuffix}`;
-            const descriptionKey = `description${langSuffix}`;
-            document.getElementById('about-title').innerText = data[titleKey] || '[No title]';
-            document.getElementById('about-description').innerHTML = data[descriptionKey] || '[No description]';
-          }
+        .then(data => {
+          const members = data?.data || [];
+
+          const roles = {
+            "Main performers": document.getElementById("main-performers"),
+            "Project Managers": document.getElementById("project-managers"),
+            "Students": document.getElementById("students"),
+            "Others": document.getElementById("others")
+          };
+
+          // Tozalash
+          for (let key in roles) roles[key].innerHTML = '';
+
+          members.forEach(member => {
+            const role = member.role?.trim() || 'Others';
+            const container = roles[role] || roles['Others'];
+            container.innerHTML += createMemberCard(member);
+          });
         })
-        .catch(error => {
-          console.error('Error:', error);
-        });
+        .catch(err => console.error('Error fetching team:', err));
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    // Sahifa yuklanganda chaqiriladi
+    document.addEventListener("DOMContentLoaded", () => {
       fetch('language.json')
         .then(res => res.json())
         .then(data => {
           translations = data;
           updateTexts();
-          fetchAboutSection();
+          renderTeam();
         });
     });
   </script>
+
 </body>
 
 </html>

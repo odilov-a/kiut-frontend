@@ -26,10 +26,10 @@
     <div class="container position-relative d-flex align-items-center justify-content-between">
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="#" id="information-page"></a></li>
+          <li><a href="./index.html" id="information-page"></a></li>
           <li><a href="./project.html" id="project-project"></a></li>
           <li><a href="./publications.html" id="publications-page"></a></li>
-          <li><a href="./secondments.html" id="secondments-page"></a></li>
+          <li><a href="#" id="secondments-page"></a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
@@ -53,13 +53,13 @@
         </div>
       </div>
     </section>
-    <section id="about" class="about section">
-      <div class="container section-title" data-aos="fade-up">
-        <h2 id="about-title"></h2>
-      </div>
 
+    <section id="faq" class="faq section">
       <div class="container">
-        <p id="about-description"></p>
+        <div class="col-lg-12" data-aos="fade-up" data-aos-delay="100">
+          <div class="faq-container" id="faq-container">
+          </div>
+        </div>
       </div>
     </section>
   </main>
@@ -72,27 +72,37 @@
     </div>
   </footer>
 
+
   <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i
       class="bi bi-arrow-up-short"></i></a>
 
   <div id="preloader"></div>
 
-  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>   
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/vendor/aos/aos.js"></script>
   <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
   <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
   <script src="assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
   <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+
   <script src="assets/js/main.js"></script>
   <script>
-    const BASE_URL = "http://localhost:5000/api";
+    const BASE_URL = 'http://localhost:5000/api';
     let currentLang = localStorage.getItem('lang') || 'en';
     let translations = {};
+
+    function capitalize(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
     function setLanguage(lang) {
       currentLang = lang;
       localStorage.setItem('lang', lang);
       updateTexts();
-      fetchAboutSection();
+    }
+
+    function getText(key) {
+      return translations[currentLang]?.[key] || `[${key}]`;
     }
 
     function updateTexts() {
@@ -103,39 +113,67 @@
       document.getElementById('project-title').innerHTML = getText('project_title');
       document.getElementById('project-description').innerHTML = getText('project_description');
       document.getElementById('project-funding').innerHTML = getText('project_funding');
+      loadSecondments();
     }
 
-    function getText(key) {
-      return translations[currentLang]?.[key] || `[${key}]`;
-    }
-
-    function fetchAboutSection() {
-      fetch(`${BASE_URL}/informations?lang=${currentLang}`)
+    function loadSecondments() {
+      const faqContainer = document.getElementById('faq-container');
+      faqContainer.innerHTML = '<p>Loading secondments...</p>';
+      fetch(`${BASE_URL}/secondments?lang=${currentLang}`)
         .then(res => res.json())
-        .then(response => {
-          const data = response.data?.[0];
-          if (data) {
-            const langSuffix = currentLang.charAt(0).toUpperCase() + currentLang.slice(1);
-            const titleKey = `title${langSuffix}`;
-            const descriptionKey = `description${langSuffix}`;
-            document.getElementById('about-title').innerText = data[titleKey] || '[No title]';
-            document.getElementById('about-description').innerHTML = data[descriptionKey] || '[No description]';
+        .then(data => {
+          faqContainer.innerHTML = '';
+          if (!data || !data.data || data.data.length === 0) {
+            faqContainer.innerHTML = '<p>No secondments found.</p>';
+            return;
           }
+          data.data.forEach(item => {
+            const title = item[`title${capitalize(currentLang)}`] || item.title || 'No title';
+            const description = item[`description${capitalize(currentLang)}`] || item.description || 'No description';
+            const faqItem = document.createElement('div');
+            faqItem.style.border = '2px solid #ccc';
+            faqItem.style.margin = '10px 0';
+            faqItem.style.padding = '10px';
+            const h3 = document.createElement('h3');
+            h3.textContent = title;
+            faqItem.appendChild(h3);
+            const descDiv = document.createElement('div');
+            descDiv.innerHTML = description;
+            faqItem.appendChild(descDiv);
+
+            if (item.photoUrl && item.photoUrl.length > 0) {
+              const imagesDiv = document.createElement('div');
+              imagesDiv.style.display = 'flex';
+              imagesDiv.style.gap = '10px';
+              imagesDiv.style.flexWrap = 'wrap';
+              imagesDiv.style.marginTop = '10px';
+              item.photoUrl.forEach(photo => {
+                const img = document.createElement('img');
+                img.src = photo;
+                img.alt = title;
+                img.style.maxWidth = '400px';
+                img.style.height = 'auto';
+                img.style.border = '1px solid #ddd';
+                img.style.borderRadius = '4px';
+                imagesDiv.appendChild(img);
+              });
+              faqItem.appendChild(imagesDiv);
+            }
+            faqContainer.appendChild(faqItem);
+          });
         })
         .catch(error => {
+          faqContainer.innerHTML = '<p>Failed to load secondments.</p>';
           console.error('Error:', error);
         });
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      fetch('language.json')
-        .then(res => res.json())
-        .then(data => {
-          translations = data;
-          updateTexts();
-          fetchAboutSection();
-        });
-    });
+    fetch('language.json')
+      .then(res => res.json())
+      .then(data => {
+        translations = data;
+        updateTexts();
+      });
   </script>
 </body>
 
