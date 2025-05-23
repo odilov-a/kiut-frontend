@@ -72,7 +72,6 @@
     </div>
   </footer>
 
-
   <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i
       class="bi bi-arrow-up-short"></i></a>
 
@@ -118,52 +117,77 @@
 
     function loadSecondments() {
       const faqContainer = document.getElementById('faq-container');
-      faqContainer.innerHTML = '<p>Loading secondments...</p>';
+      faqContainer.innerHTML = '<div class="text-center text-muted my-3">Loading secondments...</div>';
       fetch(`${BASE_URL}/secondments?lang=${currentLang}`)
         .then(res => res.json())
         .then(data => {
           faqContainer.innerHTML = '';
           if (!data || !data.data || data.data.length === 0) {
-            faqContainer.innerHTML = '<p>No secondments found.</p>';
+            faqContainer.innerHTML = '<div class="alert alert-warning">No secondments found.</div>';
             return;
           }
-          data.data.forEach(item => {
+
+          const accordion = document.createElement('div');
+          accordion.className = 'accordion';
+          accordion.id = 'secondmentAccordion';
+          data.data.forEach((item, index) => {
+            const id = `accordion-item-${index}`;
             const title = item[`title${capitalize(currentLang)}`] || item.title || 'No title';
-            const description = item[`description${capitalize(currentLang)}`] || item.description || 'No description';
-            const faqItem = document.createElement('div');
-            faqItem.style.border = '2px solid #ccc';
-            faqItem.style.margin = '10px 0';
-            faqItem.style.padding = '10px';
-            const h3 = document.createElement('h3');
-            h3.textContent = title;
-            faqItem.appendChild(h3);
+            const description = item[`description${capitalize(currentLang)}`] || item.description || '';
+            const photoUrls = item.photoUrl || [];
+            const accordionItem = document.createElement('div');
+            accordionItem.className = 'accordion-item';
+
+            const header = document.createElement('h2');
+            header.className = 'accordion-header';
+            header.id = `heading-${id}`;
+
+            const button = document.createElement('button');
+            button.className = 'accordion-button collapsed';
+            button.type = 'button';
+            button.setAttribute('data-bs-toggle', 'collapse');
+            button.setAttribute('data-bs-target', `#collapse-${id}`);
+            button.setAttribute('aria-expanded', 'false');
+            button.setAttribute('aria-controls', `collapse-${id}`);
+            button.textContent = title;
+
+            header.appendChild(button);
+            accordionItem.appendChild(header);
+
+            const collapseDiv = document.createElement('div');
+            collapseDiv.id = `collapse-${id}`;
+            collapseDiv.className = 'accordion-collapse collapse';
+            collapseDiv.setAttribute('aria-labelledby', `heading-${id}`);
+            collapseDiv.setAttribute('data-bs-parent', '#secondmentAccordion');
+
+            const body = document.createElement('div');
+            body.className = 'accordion-body';
+
             const descDiv = document.createElement('div');
             descDiv.innerHTML = description;
-            faqItem.appendChild(descDiv);
+            body.appendChild(descDiv);
 
-            if (item.photoUrl && item.photoUrl.length > 0) {
-              const imagesDiv = document.createElement('div');
-              imagesDiv.style.display = 'flex';
-              imagesDiv.style.gap = '10px';
-              imagesDiv.style.flexWrap = 'wrap';
-              imagesDiv.style.marginTop = '10px';
-              item.photoUrl.forEach(photo => {
+            if (photoUrls.length > 0) {
+              const imgWrapper = document.createElement('div');
+              imgWrapper.className = 'mt-3 d-flex flex-wrap gap-3';
+              photoUrls.forEach(photo => {
                 const img = document.createElement('img');
                 img.src = photo;
                 img.alt = title;
-                img.style.maxWidth = '400px';
-                img.style.height = 'auto';
-                img.style.border = '1px solid #ddd';
-                img.style.borderRadius = '4px';
-                imagesDiv.appendChild(img);
+                img.className = 'img-fluid rounded border shadow-sm';
+                img.style.maxWidth = '300px';
+                imgWrapper.appendChild(img);
               });
-              faqItem.appendChild(imagesDiv);
+              body.appendChild(imgWrapper);
             }
-            faqContainer.appendChild(faqItem);
+            collapseDiv.appendChild(body);
+            accordionItem.appendChild(collapseDiv);
+            accordion.appendChild(accordionItem);
           });
+          faqContainer.appendChild(accordion);
         })
         .catch(error => {
-          faqContainer.innerHTML = '<p>Failed to load secondments.</p>';
+          faqContainer.innerHTML = '<div class="alert alert-danger">Failed to load secondments.</div>';
           console.error('Error:', error);
         });
     }
