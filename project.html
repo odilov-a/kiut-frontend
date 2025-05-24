@@ -89,6 +89,7 @@
 
   <script src="assets/js/main.js"></script>
   <script>
+    const BASE_URL = "http://localhost:5002/api";
     let currentLang = localStorage.getItem('lang') || 'en';
     let translations = {};
 
@@ -142,11 +143,10 @@
     }
 
     function renderTeam() {
-      fetch('http://localhost:5000/api/participants')
+      fetch(`${BASE_URL}/participants?lang=${currentLang}`)
         .then(res => res.json())
         .then(data => {
           const members = data?.data || [];
-
           const roles = {
             "Main performers": document.getElementById("main-performers"),
             "Project Managers": document.getElementById("project-managers"),
@@ -154,9 +154,7 @@
             "Others": document.getElementById("others")
           };
 
-          // Tozalash
           for (let key in roles) roles[key].innerHTML = '';
-
           members.forEach(member => {
             const role = member.role?.trim() || 'Others';
             const container = roles[role] || roles['Others'];
@@ -166,7 +164,6 @@
         .catch(err => console.error('Error fetching team:', err));
     }
 
-    // Sahifa yuklanganda chaqiriladi
     document.addEventListener("DOMContentLoaded", () => {
       fetch('language.json')
         .then(res => res.json())
