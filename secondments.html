@@ -7,7 +7,7 @@
   <title>Project</title>
   <meta name="description" content="Kimyo International University in Tashkent">
   <meta name="keywords" content="Kimyo International University in Tashkent">
-  <link href="assets/img/favicon.jpg" rel="icon">
+  <link href="assets/img/logo.png" rel="icon">
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
   <link
@@ -167,19 +167,6 @@
             descDiv.innerHTML = description;
             body.appendChild(descDiv);
 
-            if (photoUrls.length > 0) {
-              const imgWrapper = document.createElement('div');
-              imgWrapper.className = 'mt-3 d-flex flex-wrap gap-3';
-              photoUrls.forEach(photo => {
-                const img = document.createElement('img');
-                img.src = photo;
-                img.alt = title;
-                img.className = 'img-fluid rounded border shadow-sm';
-                img.style.maxWidth = '300px';
-                imgWrapper.appendChild(img);
-              });
-              body.appendChild(imgWrapper);
-            }
             collapseDiv.appendChild(body);
             accordionItem.appendChild(collapseDiv);
             accordion.appendChild(accordionItem);
